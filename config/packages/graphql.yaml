@@ -1,10 +1,9 @@
 overblog_graphql:
-    definitions:
-        schema:
-            query: Query
-        mappings:
-            types:
-                -
-                    type: yaml
-                    dir: "%kernel.project_dir%/config/graphql/types"
-                    suffix: null
+  definitions:
+    schema:
+      query: RootQuery
+    mappings:
+      types:
+        - type: graphql
+          dir: "%kernel.project_dir%/config/graphql/types"
+          suffix: null
