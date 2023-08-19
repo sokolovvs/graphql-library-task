@@ -1,0 +1,6 @@
+type RootQuery {
+    author(id: ID!): Author
+    authors: [Author!]!
+    books: [Book!]!
+    book(id:ID!): Book
+}
