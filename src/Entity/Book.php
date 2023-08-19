@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use DomainException;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ORM\Table(name: 'books')]
 class Book
 {
     #[ORM\Id]
