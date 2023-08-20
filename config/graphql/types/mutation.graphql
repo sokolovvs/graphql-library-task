@@ -1,4 +1,5 @@
 type RootMutation {
     createAuthor(author: AuthorData!): Author!
     editAuthor(id: ID!, author: AuthorData!): Author!
+    deleteAuthor(id: ID!): Boolean!
 }

@@ -14,4 +14,6 @@ interface AuthorRepositoryInterface
     public function findAllAuthors(): array;
 
     public function save(Author $author): void;
+
+    public function remove(Author $author): void;
 }

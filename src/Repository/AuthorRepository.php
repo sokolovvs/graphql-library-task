@@ -32,4 +32,10 @@ class AuthorRepository extends ServiceEntityRepository implements AuthorReposito
         $this->_em->persist($author);
         $this->_em->flush();
     }
+
+    public function remove(Author $author): void
+    {
+        $this->_em->remove($author);
+        $this->_em->flush();
+    }
 }

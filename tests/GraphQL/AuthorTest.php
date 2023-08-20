@@ -138,7 +138,37 @@ class AuthorTest extends WebTestCase
         $decodedResponse = json_decode($response->getContent(), true);
         $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
         self::assertEquals('This value is too short. It should have 2 characters or more.' . PHP_EOL, $actualMessage);
+    }
 
+    public function testDeleteUnknownAuthor(): void
+    {
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteAuthorMutation(-1));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals('Unknown author #-1', $actualMessage);
+    }
+
+    public function testDeleteAuthor(): void
+    {
+        $author = $this->addAuthor('Erica H.');
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteAuthorMutation($authorId = $author->getId()));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals([
+            "data" => [
+                "deleteAuthor" => true
+            ]
+        ], $decodedResponse);
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteAuthorMutation($authorId));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("Unknown author #$authorId", $actualMessage);
     }
 
     private function addAuthor(string $name): Author
@@ -194,6 +224,17 @@ class AuthorTest extends WebTestCase
 }",
             "variables" => null,
             "operationName" => "EditAuthor"
+        ];
+    }
+
+    private function deleteAuthorMutation(int $id): array
+    {
+        return [
+            "query" => "mutation deleteAuthor {
+  deleteAuthor(id: $id)
+}",
+            "variables" => null,
+            "operationName" => "deleteAuthor"
         ];
     }
 }
