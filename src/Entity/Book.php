@@ -28,7 +28,7 @@ class Book
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $publicationDate = null;
 
-    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books')]
+    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books',cascade: ['persist'])]
     private Collection $authors;
 
     public function __construct(
@@ -44,6 +44,9 @@ class Book
         $this->name = $name;
         $this->description = $description;
         $this->publicationDate = $publicationDate;
+        foreach ($authors as $author) {
+            $author->addBook($this);
+        }
         $this->authors = new ArrayCollection($authors);
     }
 

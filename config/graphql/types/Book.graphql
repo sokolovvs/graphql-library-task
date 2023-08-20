@@ -4,3 +4,10 @@ type Book {
     description: String
     publicationDate: String
 }
+
+input CreateBookData {
+    name: String!
+    description: String
+    publicationDate: String
+    authors: [ID!]!
+}

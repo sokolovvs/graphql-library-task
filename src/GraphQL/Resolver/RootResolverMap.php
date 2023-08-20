@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolver;
 
 use App\GraphQL\Mutator\AuthorMutator;
+use App\GraphQL\Mutator\BookMutator;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
 use ArrayObject;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -13,14 +14,17 @@ class RootResolverMap extends ResolverMap
 {
     private AuthorRepositoryInterface $authors;
     private AuthorMutator $authorMutator;
+    private BookMutator $bookMutator;
 
     public function __construct(
         AuthorRepositoryInterface $authors,
-        AuthorMutator $authorMutator
+        AuthorMutator $authorMutator,
+        BookMutator $bookMutator
     )
     {
         $this->authors = $authors;
         $this->authorMutator = $authorMutator;
+        $this->bookMutator = $bookMutator;
     }
 
     protected function map()
@@ -51,6 +55,8 @@ class RootResolverMap extends ResolverMap
                         'createAuthor' => $this->authorMutator->create($args),
                         'editAuthor' => $this->authorMutator->edit($args),
                         'deleteAuthor' => $this->authorMutator->delete($args),
+
+                        'createBook' => $this->bookMutator->create($args),
                         default => null
                     };
                 },
