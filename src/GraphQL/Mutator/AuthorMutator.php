@@ -2,7 +2,7 @@
 
 namespace App\GraphQL\Mutator;
 
-use App\Dto\NewAuthorDto;
+use App\Dto\AuthorDto;
 use App\Entity\Author;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
 use App\Interfaces\Service\ErrorFormatterInterface;
@@ -29,13 +29,29 @@ class AuthorMutator
 
     public function create(ArgumentInterface $argument): Author|UserError
     {
-        $dto = new NewAuthorDto($argument['author']['name'] ?? '');
+        $dto = new AuthorDto($argument['author']['name'] ?? '');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
         }
         $author = new Author($dto->name);
         $this->authors->save($author);
+
+        return $author;
+    }
+
+    public function edit(ArgumentInterface $argument): Author|UserError
+    {
+        $author = $this->authors->findById($id = $argument['id'] ?? -1);
+        if ($author === null) {
+            return new UserError("Unknown author #$id");
+        }
+        $dto = new AuthorDto($argument['author']['name'] ?? '');
+        $violationList = $this->validator->validate($dto);
+        if ($violationList->count()) {
+            return new UserError($this->errorFormatter->format($violationList));
+        }
+        $author->updateName($dto->name);
 
         return $author;
     }

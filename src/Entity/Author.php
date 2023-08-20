@@ -41,6 +41,13 @@ class Author
         return $this->name;
     }
 
+    public function updateName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getNumberBooks(): ?int
     {
         return $this->numberBooks;

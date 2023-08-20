@@ -49,6 +49,7 @@ class RootResolverMap extends ResolverMap
                 ) {
                     return match ($info->fieldName) {
                         'createAuthor' => $this->authorMutator->create($args),
+                        'editAuthor' => $this->authorMutator->edit($args),
                         default => null
                     };
                 },

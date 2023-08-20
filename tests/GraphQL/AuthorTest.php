@@ -90,7 +90,7 @@ class AuthorTest extends WebTestCase
     }
 
     /**
-     * @dataProvider authorFailCases
+     * @dataProvider createAuthorFailCases
      */
     public function testCreateAuthorFailCases(string $name, string $expectedMessage): void
     {
@@ -102,10 +102,43 @@ class AuthorTest extends WebTestCase
         self::assertEquals($expectedMessage, $message);
     }
 
-    public function authorFailCases(): iterable
+    public function createAuthorFailCases(): iterable
     {
         yield 'input error if name is too short' => [' S   ', 'This value is too short. It should have 2 characters or more.' . PHP_EOL];
         yield 'input error if name is too long' => [str_repeat('A', 1222), 'This value is too long. It should have 128 characters or less.' . PHP_EOL];
+    }
+
+    public function testUpdateAuthor(): void
+    {
+        $author = $this->addAuthor('Jack Sparrow');
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->updateAuthorMutation($author->getId(), $expectedName = 'Jack Falcon'));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $newName = $decodedResponse['data']['editAuthor']['name'] ?? '';
+        self::assertEquals($expectedName, $newName);
+    }
+
+    public function testUpdateAuthorFailedIfUnknownAuthor(): void
+    {
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->updateAuthorMutation(-1, 'Philip Roth'));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals('Unknown author #-1', $actualMessage);
+    }
+
+    public function testUpdateAuthorFailedIfNameIsInvalid(): void
+    {
+        $author = $this->addAuthor('Erica Jong');
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->updateAuthorMutation($author->getId(), ' E \n'));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals('This value is too short. It should have 2 characters or more.' . PHP_EOL, $actualMessage);
+
     }
 
     private function addAuthor(string $name): Author
@@ -147,6 +180,20 @@ class AuthorTest extends WebTestCase
 }",
             "variables" => null,
             "operationName" => "CreateAuthor"
+        ];
+    }
+
+    private function updateAuthorMutation(int $id, string $name): array
+    {
+        return [
+            "query" => "mutation EditAuthor {
+  editAuthor(id: $id, author: {name: \"$name\"}){
+    id,
+    name
+  }
+}",
+            "variables" => null,
+            "operationName" => "EditAuthor"
         ];
     }
 }

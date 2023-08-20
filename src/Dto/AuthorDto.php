@@ -4,7 +4,7 @@ namespace App\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class NewAuthorDto
+class AuthorDto
 {
     #[Assert\Length(min: 2, max: 128)]
     public readonly string $name;
