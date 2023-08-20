@@ -89,6 +89,25 @@ class AuthorTest extends WebTestCase
         ], $decodedResponse);
     }
 
+    /**
+     * @dataProvider authorFailCases
+     */
+    public function testCreateAuthorFailCases(string $name, string $expectedMessage): void
+    {
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->createAuthorMutation($name));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $message = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals($expectedMessage, $message);
+    }
+
+    public function authorFailCases(): iterable
+    {
+        yield 'input error if name is too short' => [' S   ', 'This value is too short. It should have 2 characters or more.' . PHP_EOL];
+        yield 'input error if name is too long' => [str_repeat('A', 1222), 'This value is too long. It should have 128 characters or less.' . PHP_EOL];
+    }
+
     private function addAuthor(string $name): Author
     {
         $this->em->persist($author = new Author($name));
