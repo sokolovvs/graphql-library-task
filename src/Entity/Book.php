@@ -66,9 +66,9 @@ class Book
         return $this->description;
     }
 
-    public function getPublicationDate(): ?DateTimeImmutable
+    public function getPublicationDate()
     {
-        return $this->publicationDate;
+        return $this->publicationDate->format('Y-m-d');
     }
 
     /**

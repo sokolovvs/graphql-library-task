@@ -179,7 +179,7 @@ class AuthorTest extends WebTestCase
         return $author;
     }
 
-    private function authorByIdQuery(Author|int $author): string
+    public static function authorByIdQuery(Author|int $author): string
     {
         $id = $author instanceof Author ? $author->getId() : $author;
         return "query {
