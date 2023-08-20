@@ -20,10 +20,10 @@ class BookMutator
     private AuthorRepositoryInterface $authors;
 
     public function __construct(
-        BookRepositoryInterface $books,
+        BookRepositoryInterface   $books,
         AuthorRepositoryInterface $authors,
-        ValidatorInterface      $validator,
-        ErrorFormatterInterface $errorFormatter
+        ValidatorInterface        $validator,
+        ErrorFormatterInterface   $errorFormatter
     )
     {
         $this->books = $books;
@@ -57,5 +57,19 @@ class BookMutator
         $this->books->save($book);
 
         return $book;
+    }
+
+    public function delete(ArgumentInterface $argument): bool|UserError
+    {
+        $id = (int)$argument['id'];
+
+        $book = $this->books->findById($id);
+        if ($book === null) {
+            return new UserError("Unknown book#$id");
+        }
+
+        $this->books->remove($book);
+
+        return true;
     }
 }

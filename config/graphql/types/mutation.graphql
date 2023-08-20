@@ -4,4 +4,5 @@ type RootMutation {
     deleteAuthor(id: ID!): Boolean!
 
     createBook(book: CreateBookData!): Book!
+    deleteBook(id: ID!): Boolean!
 }
