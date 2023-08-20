@@ -34,3 +34,7 @@ services:
     App\GraphQL\Resolver\RootResolverMap:
       tags:
         - { name: overblog_graphql.resolver_map, schema: default }
+
+    App\EventListener\AuthorBooksEventListener:
+      tags:
+        - { name: doctrine.event_listener, event: onFlush }

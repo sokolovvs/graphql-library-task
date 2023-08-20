@@ -48,6 +48,13 @@ class Author
         return $this;
     }
 
+    public function updateBookNumber(): self
+    {
+        $this->numberBooks = $this->getBooks()->count();
+
+        return $this;
+    }
+
     public function getNumberBooks(): ?int
     {
         return $this->numberBooks;

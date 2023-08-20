@@ -12,6 +12,7 @@ use DomainException;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 #[ORM\Table(name: 'books')]
+#[ORM\HasLifecycleCallbacks()]
 class Book
 {
     #[ORM\Id]
