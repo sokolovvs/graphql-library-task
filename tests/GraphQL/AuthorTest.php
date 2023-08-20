@@ -57,10 +57,36 @@ class AuthorTest extends WebTestCase
         self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
         $decodedResponse = json_decode($response->getContent(), true);
         $firstAuthor = $decodedResponse['data']['authors'][0] ?? [];
-        self::assertEquals($firstAuthor,  [
+        self::assertEquals($firstAuthor, [
             "name" => "Suzanne Collins",
             "numberBooks" => 0
         ]);
+    }
+
+    public function testCreateAuthor(): void
+    {
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->createAuthorMutation('Jeremy Parker'));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        $decodedResponse = json_decode($response->getContent(), true);
+        $id = $decodedResponse['data']['createAuthor']['id'] ?? -1;
+
+
+        $this->httpClient->request(Request::METHOD_POST, '/', [
+            'query' => $this->authorByIdQuery($id),
+            'variables' => null,
+        ]);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        $decodedResponse = json_decode($response->getContent(), true);
+        self::assertEquals([
+            "data" => [
+                "author" => [
+                    "name" => "Jeremy Parker",
+                    "numberBooks" => 0
+                ]
+            ]
+        ], $decodedResponse);
     }
 
     private function addAuthor(string $name): Author
@@ -71,10 +97,11 @@ class AuthorTest extends WebTestCase
         return $author;
     }
 
-    private function authorByIdQuery(Author $author): string
+    private function authorByIdQuery(Author|int $author): string
     {
+        $id = $author instanceof Author ? $author->getId() : $author;
         return "query {
-  author(id: {$author->getId()}) {
+  author(id: $id) {
     name,
     numberBooks
   }
@@ -89,5 +116,18 @@ class AuthorTest extends WebTestCase
     numberBooks
   }
 }';
+    }
+
+    private function createAuthorMutation(string $name): array
+    {
+        return [
+            "query" => "mutation CreateAuthor {
+  createAuthor(author: {name: \"$name\"}){
+    id
+  }
+}",
+            "variables" => null,
+            "operationName" => "CreateAuthor"
+        ];
     }
 }

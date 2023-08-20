@@ -13,4 +13,5 @@ interface AuthorRepositoryInterface
      */
     public function findAllAuthors(): array;
 
+    public function save(Author $author): void;
 }

@@ -26,4 +26,10 @@ class AuthorRepository extends ServiceEntityRepository implements AuthorReposito
     {
         return $this->findAll();
     }
+
+    public function save(Author $author): void
+    {
+        $this->_em->persist($author);
+        $this->_em->flush();
+    }
 }
