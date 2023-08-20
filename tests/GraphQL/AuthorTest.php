@@ -34,7 +34,7 @@ class AuthorTest extends WebTestCase
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
-        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
         self::assertEquals([
             "data" => [
@@ -54,20 +54,20 @@ class AuthorTest extends WebTestCase
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
-        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
         $firstAuthor = $decodedResponse['data']['authors'][0] ?? [];
-        self::assertEquals($firstAuthor, [
+        self::assertEquals([
             "name" => "Suzanne Collins",
             "numberBooks" => 0
-        ]);
+        ], $firstAuthor);
     }
 
     public function testCreateAuthor(): void
     {
         $this->httpClient->request(Request::METHOD_POST, '/', $this->createAuthorMutation('Jeremy Parker'));
         $response = $this->httpClient->getResponse();
-        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
         $id = $decodedResponse['data']['createAuthor']['id'] ?? -1;
 
@@ -77,7 +77,7 @@ class AuthorTest extends WebTestCase
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
-        self::assertEquals($response->getStatusCode(), Response::HTTP_OK);
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
         self::assertEquals([
             "data" => [
