@@ -28,6 +28,9 @@ services:
     App\Interfaces\Repository\AuthorRepositoryInterface:
         alias: App\Repository\AuthorRepository
 
+    App\Interfaces\Repository\BookRepositoryInterface:
+        alias: App\Repository\BookRepository
+
     App\GraphQL\Resolver\RootResolverMap:
       tags:
         - { name: overblog_graphql.resolver_map, schema: default }
