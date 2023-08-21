@@ -108,6 +108,48 @@ BD;
         }
     }
 
+    public function testRemoveBookUnknownBook(): void
+    {
+        $this->em->persist($author = new Author('Katherine Dunn'));
+        $this->em->flush();
+        $this->em->persist($book = new Book('Geek Love', self::BOOK_DESCRIPTION, new DateTimeImmutable('1996-05-01'), $author));
+        $this->em->flush();
+        $id = $book->getId() * (-1);
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteBookByIdMutation($id));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $message = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("Unknown book#$id", $message);
+    }
+
+    public function testRemoveBookOk(): void
+    {
+        $this->em->persist($author = new Author('Katherine Dunn'));
+        $this->em->flush();
+        $this->em->persist($book = new Book('Geek Love', self::BOOK_DESCRIPTION, new DateTimeImmutable('1996-05-01'), $author));
+        $this->em->flush();
+        $id = $book->getId();
+        $authorId = $author->getId();
+        $beforeNumberBooks = $author->getNumberBooks();
+        self::assertEquals(1, $beforeNumberBooks);
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteBookByIdMutation($id));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $result = $decodedResponse['data']['deleteBook'] ?? false;
+        self::assertTrue($result);
+        $numberBooks = $this->em->getConnection()->fetchOne("select number_books from authors where id=$authorId");
+        self::assertEquals($beforeNumberBooks - 1, $numberBooks);
+
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteBookByIdMutation($id));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $message = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("Unknown book#$id", $message);
+    }
+
     private function createBookMutation(string $name, string $description, string $publicationDate, array $authors): array
     {
         $authors = implode(',', $authors);
@@ -153,6 +195,18 @@ BD;
 ",
             "variables" => null,
             "operationName" => "GetBooks"
+        ];
+    }
+
+    private function deleteBookByIdMutation(int $id): array
+    {
+        return [
+            "query" => "mutation DeleteBook {
+  deleteBook(id: $id)
+}
+",
+            "variables" => null,
+            "operationName" => "DeleteBook"
         ];
     }
 }

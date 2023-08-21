@@ -67,6 +67,9 @@ class BookMutator
         if ($book === null) {
             return new UserError("Unknown book#$id");
         }
+        foreach ($book->getAuthors() as $author) {
+            $author->removeBook($book);
+        }
 
         $this->books->remove($book);
 
