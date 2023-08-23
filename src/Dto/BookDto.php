@@ -6,7 +6,7 @@ use App\Constraints\AuthorIdConstraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-class CreateBookDto
+class BookDto
 {
     #[Assert\Length(min: 2, max: 255)]
     public readonly string $name;

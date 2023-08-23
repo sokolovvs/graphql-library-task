@@ -3,6 +3,7 @@ type RootMutation {
     editAuthor(id: ID!, author: AuthorData!): Author!
     deleteAuthor(id: ID!): Boolean!
 
-    createBook(book: CreateBookData!): Book!
+    createBook(book: BookData!): Book!
+    editBook(id: ID!, book: BookData!): Book!
     deleteBook(id: ID!): Boolean!
 }

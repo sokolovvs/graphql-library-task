@@ -64,6 +64,7 @@ class RootResolverMap extends ResolverMap
                         'deleteAuthor' => $this->authorMutator->delete($args),
 
                         'createBook' => $this->bookMutator->create($args),
+                        'editBook' => $this->bookMutator->edit($args),
                         'deleteBook' => $this->bookMutator->delete($args),
                         default => null
                     };

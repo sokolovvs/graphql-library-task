@@ -2,7 +2,8 @@
 
 namespace App\GraphQL\Mutator;
 
-use App\Dto\CreateBookDto;
+use App\Dto\BookDto;
+use App\Entity\Author;
 use App\Entity\Book;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
 use App\Interfaces\Repository\BookRepositoryInterface;
@@ -34,7 +35,7 @@ class BookMutator
 
     public function create(ArgumentInterface $argument): Book|UserError
     {
-        $dto = new CreateBookDto(
+        $dto = new BookDto(
             $argument['book']['name'] ?? '',
             $argument['book']['authors'] ?? [],
             $argument['book']['description'] ?? null,
@@ -54,6 +55,44 @@ class BookMutator
             new DateTimeImmutable($dto->publicationDate),
             ...$authors
         );
+        $this->books->save($book);
+
+        return $book;
+    }
+
+    public function edit(ArgumentInterface $argument): Book|UserError {
+
+        $book = $this->books->findById($id = $argument['id'] ?? -1);
+        if ($book === null) {
+            return new UserError("Unknown book #$id");
+        }
+
+        $dto = new BookDto(
+            $argument['book']['name'] ?? '',
+            $argument['book']['authors'] ?? [],
+            $argument['book']['description'] ?? null,
+            $argument['book']['publicationDate'] ?? '',
+        );
+        $violationList = $this->validator->validate($dto);
+        if ($violationList->count()) {
+            return new UserError($this->errorFormatter->format($violationList));
+        }
+
+        $existedAuthors = $book->getAuthors()->map(fn(Author $author) => $author->getId())->toArray();
+        foreach ($existedAuthors as $id) {
+            if (!in_array($id, $dto->authors)) {
+                $book->removeAuthor($this->authors->findById($id));
+            }
+        }
+        foreach($dto->authors as $id) {
+            if (!in_array($id, $existedAuthors)){
+                $book->addAuthor($this->authors->findById($id));
+            }
+        }
+        $book->updateName($dto->name)
+            ->updateDescription($dto->description)
+            ->updatePublicationDate(new DateTimeImmutable($dto->publicationDate));
+
         $this->books->save($book);
 
         return $book;

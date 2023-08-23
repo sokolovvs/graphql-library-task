@@ -5,7 +5,7 @@ type Book {
     publicationDate: String
 }
 
-input CreateBookData {
+input BookData {
     name: String!
     description: String
     publicationDate: String

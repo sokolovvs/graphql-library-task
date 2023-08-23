@@ -28,6 +28,12 @@ class AuthorBooksEventListener
             )
         );
 
+        foreach ($uow->getScheduledEntityUpdates() as $author) {
+            if ($author instanceof Author) {
+                $author->updateBookNumber();
+                $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(Author::class), $author);
+            }
+        }
         foreach ($booksIds as $id) {
             $book = $this->books->findById($id);
             foreach ($book->getAuthors() as $author) {

@@ -61,14 +61,35 @@ class Book
         return $this->name;
     }
 
+    public function updateName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    public function updateDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
     public function getPublicationDate()
     {
         return $this->publicationDate->format('Y-m-d');
+    }
+
+    public function updatePublicationDate(?DateTimeImmutable $date): self
+    {
+        $this->publicationDate = $date;
+
+        return $this;
     }
 
     /**
