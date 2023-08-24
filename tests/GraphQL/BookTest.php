@@ -150,6 +150,89 @@ BD;
         self::assertEquals("Unknown book#$id", $message);
     }
 
+    public function testEditBook(): void
+    {
+        $this->em->persist($author = new Author('Lewis Carroll'));
+        $this->em->flush();
+        $this->em->persist($author2 = new Author('Lewis Carroll'));
+        $this->em->flush();
+        $name = 'Alice in Wonderland';
+        $description = self::BOOK_DESCRIPTION;
+        $request = $this->createBookMutation($name, $description, '1865-01-01', [$authorId = $author->getId(), $author2Id = $author2->getId()]);
+        $this->httpClient->request(Request::METHOD_POST, '/', $request);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $id = $decodedResponse['data']['createBook']['id'] ?? -1;
+
+        $name = 'In the Heart of the Sea';
+        $description = 'some description';
+        $request = $this->editBookByIdMutation($id, $name, $description, '1965-05-12', [$authorId,]);
+        $this->httpClient->request(Request::METHOD_POST, '/', $request);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualId = $decodedResponse['data']['editBook']['id'] ?? -1;
+        $actualName = $decodedResponse['data']['editBook']['name'] ?? '';
+        $actualDescription = $decodedResponse['data']['editBook']['description'] ?? '';
+        $actualPublicationDate = $decodedResponse['data']['editBook']['publicationDate'] ?? '';
+        self::assertEquals($id, $actualId);
+        self::assertEquals($name, $actualName);
+        self::assertEquals($description, $actualDescription);
+        self::assertEquals('1965-05-12', $actualPublicationDate);
+
+        $this->httpClient->request(Request::METHOD_POST, '/', [
+            'query' => AuthorTest::authorByIdQuery($authorId),
+            'variables' => null,
+        ]);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $numberBooks = $decodedResponse['data']['author']['numberBooks'] ?? -1;
+        self::assertEquals(1, $numberBooks);
+
+        $this->httpClient->request(Request::METHOD_POST, '/', [
+            'query' => AuthorTest::authorByIdQuery($author2Id),
+            'variables' => null,
+        ]);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $numberBooks = $decodedResponse['data']['author']['numberBooks'] ?? -1;
+        self::assertEquals(0, $numberBooks);
+    }
+
+    public function testErrorIfEditUnknownBook(): void
+    {
+        $this->em->persist($author = new Author('Lewis Carroll'));
+        $this->em->flush();
+        $name = 'Alice in Wonderland';
+        $description = self::BOOK_DESCRIPTION;
+        $request = $this->editBookByIdMutation(-1, $name, $description, '1965-05-12', [$author->getId()]);
+        $this->httpClient->request(Request::METHOD_POST, '/', $request);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $message = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("Unknown book#-1", $message);
+    }
+
+    public function testErrorIfEditDataInvalid(): void
+    {
+        $this->em->persist($author = new Author('Lewis Carroll'));
+        $this->em->flush();
+        $this->em->persist($book = new Book('Little women', 'lalala', new DateTimeImmutable('2015-05-26'), $author));
+        $this->em->flush();
+
+        $request = $this->editBookByIdMutation($book->getId(), 'X', '', '1666-05-19', [$author->getId()]);
+        $this->httpClient->request(Request::METHOD_POST, '/', $request);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $message = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("This value is too short. It should have 2 characters or more.\n", $message);
+    }
+
     private function createBookMutation(string $name, string $description, string $publicationDate, array $authors): array
     {
         $authors = implode(',', $authors);
@@ -207,6 +290,25 @@ BD;
 ",
             "variables" => null,
             "operationName" => "DeleteBook"
+        ];
+    }
+
+    private function editBookByIdMutation(int $bookId, string $name, string $description, string $publicationDate, array $authors): array
+    {
+        $authors = implode(',', $authors);
+
+        return [
+            "query" => "mutation EditBook {
+  editBook(id: $bookId, book: {name: \"$name\", description: \"$description\", publicationDate: \"$publicationDate\", authors: [$authors]}) {
+    id
+    name
+    description
+    publicationDate
+  }
+}
+",
+            "variables" => null,
+            "operationName" => "EditBook"
         ];
     }
 }
