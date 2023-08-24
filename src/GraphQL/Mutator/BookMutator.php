@@ -60,11 +60,11 @@ class BookMutator
         return $book;
     }
 
-    public function edit(ArgumentInterface $argument): Book|UserError {
-
+    public function edit(ArgumentInterface $argument): Book|UserError
+    {
         $book = $this->books->findById($id = $argument['id'] ?? -1);
         if ($book === null) {
-            return new UserError("Unknown book #$id");
+            return new UserError("Unknown book#$id");
         }
 
         $dto = new BookDto(
@@ -84,8 +84,8 @@ class BookMutator
                 $book->removeAuthor($this->authors->findById($id));
             }
         }
-        foreach($dto->authors as $id) {
-            if (!in_array($id, $existedAuthors)){
+        foreach ($dto->authors as $id) {
+            if (!in_array($id, $existedAuthors)) {
                 $book->addAuthor($this->authors->findById($id));
             }
         }
