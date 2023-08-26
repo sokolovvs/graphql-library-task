@@ -10,6 +10,8 @@ Book:
         type: String
       publicationDate:
         type: String
+      authors:
+        type: '[Author!]!'
 
 BookData:
   type: input-object

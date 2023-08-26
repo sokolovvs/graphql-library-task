@@ -2,7 +2,8 @@
 
 namespace App\GraphQL\Mutator;
 
-use App\Dto\BookDto;
+use App\Dto\Input\BookDto as BookInputDto;
+use App\Dto\Output\BookDto as BookOutputDto;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
@@ -36,9 +37,9 @@ class BookMutator
         $this->serializer = $serializer;
     }
 
-    public function createBook(array $data): Book|UserError
+    public function createBook(array $data): BookOutputDto|UserError
     {
-        $dto = $this->serializer->deserialize(json_encode($data), BookDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), BookInputDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -55,17 +56,17 @@ class BookMutator
         );
         $this->books->save($book);
 
-        return $book;
+        return BookOutputDto::fromBookEntity($book);
     }
 
-    public function editBook(int $id, array $data): Book|UserError
+    public function editBook(int $id, array $data): BookOutputDto|UserError
     {
         $book = $this->books->findById($id);
         if ($book === null) {
             return new UserError("Unknown book#$id");
         }
 
-        $dto = $this->serializer->deserialize(json_encode($data), BookDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), BookInputDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -88,7 +89,7 @@ class BookMutator
 
         $this->books->save($book);
 
-        return $book;
+        return BookOutputDto::fromBookEntity($book);
     }
 
     public function deleteBook(int $id): bool|UserError

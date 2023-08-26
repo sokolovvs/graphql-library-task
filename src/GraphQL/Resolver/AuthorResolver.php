@@ -2,10 +2,9 @@
 
 namespace App\GraphQL\Resolver;
 
+use App\Dto\Output\AuthorDto;
 use App\Entity\Author;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
-use GraphQL\Type\Definition\ResolveInfo;
-use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 
 final class AuthorResolver
 {
@@ -16,18 +15,15 @@ final class AuthorResolver
         $this->authors = $authors;
     }
 
-    public function author(int $id): ?Author
+    public function author(int $id): ?AuthorDto
     {
-        return $this->authors->findById($id);
+        $author = $this->authors->findById($id);
+
+        return $author ? AuthorDto::fromAuthorEntity($author) : null;
     }
 
     public function authors(): array
     {
-        return $this->authors->findAllAuthors();
-    }
-
-    public function __invoke(ResolveInfo $info, ArgumentInterface $arguments)
-    {
-        return $this->{$info->fieldName}($arguments);
+        return array_map(fn(Author $author) => AuthorDto::fromAuthorEntity($author), $this->authors->findAllAuthors());
     }
 }

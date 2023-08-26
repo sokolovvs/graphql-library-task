@@ -2,7 +2,8 @@
 
 namespace App\GraphQL\Mutator;
 
-use App\Dto\AuthorDto;
+use App\Dto\Input\AuthorDto as AuthorInputDto;
+use App\Dto\Output\AuthorDto as AuthorOutputDto;
 use App\Entity\Author;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
 use App\Interfaces\Service\ErrorFormatterInterface;
@@ -30,9 +31,9 @@ class AuthorMutator
         $this->serializer = $serializer;
     }
 
-    public function createAuthor(array $data): Author|UserError
+    public function createAuthor(array $data): AuthorOutputDto|UserError
     {
-        $dto = $this->serializer->deserialize(json_encode($data), AuthorDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), AuthorInputDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -40,16 +41,16 @@ class AuthorMutator
         $author = new Author($dto->name);
         $this->authors->save($author);
 
-        return $author;
+        return AuthorOutputDto::fromAuthorEntity($author);
     }
 
-    public function editAuthor(int $id, array $data): Author|UserError
+    public function editAuthor(int $id, array $data): AuthorOutputDto|UserError
     {
         $author = $this->authors->findById($id);
         if ($author === null) {
             return new UserError("Unknown author #$id");
         }
-        $dto = $this->serializer->deserialize(json_encode($data), AuthorDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), AuthorInputDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -57,7 +58,7 @@ class AuthorMutator
         $author->updateName($dto->name);
         $this->authors->save($author);
 
-        return $author;
+        return AuthorOutputDto::fromAuthorEntity($author);
     }
 
     public function deleteAuthor(int $id): bool|UserError
