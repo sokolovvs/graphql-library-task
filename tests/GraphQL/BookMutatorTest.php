@@ -12,8 +12,10 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BookTest extends WebTestCase
+class BookMutatorTest extends WebTestCase
 {
+    use BookTestTrait;
+
     private const BOOK_DESCRIPTION = <<<BD
 Alice's Adventures in Wonderland (commonly Alice in Wonderland) is an 1865 English children's novel by Lewis Carroll, a mathematics don at Oxford University. It details the story of a young girl named Alice who falls through a rabbit hole into a fantasy world of anthropomorphic creatures. It is seen as an example of the literary nonsense genre. The artist John Tenniel provided 42 wood-engraved illustrations for the book.
 BD;
@@ -67,7 +69,7 @@ BD;
 
 
         $this->httpClient->request(Request::METHOD_POST, '/', [
-            'query' => AuthorTest::authorByIdQuery($authorId),
+            'query' => AuthorResolverTest::authorByIdQuery($authorId),
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
@@ -90,27 +92,6 @@ BD;
             "This value is too long. It should have 1024 characters or less." . PHP_EOL .
             "This value is not a valid date." . PHP_EOL .
             "Invalid authorId" . PHP_EOL, $message);
-    }
-
-    public function testBooks(): void
-    {
-        $this->em->persist($author = new Author('Katherine Dunn'));
-        $this->em->flush();
-        $this->em->persist($book = new Book('Geek Love', self::BOOK_DESCRIPTION, new DateTimeImmutable('1996-05-01'), $author));
-        $this->em->flush();
-        $this->httpClient->request(Request::METHOD_POST, '/', $this->queryBooks());
-        $response = $this->httpClient->getResponse();
-        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $decodedResponse = json_decode($response->getContent(), true);
-        $books = $decodedResponse['data']['books'] ?? [];
-        foreach ($books as $book) {
-            self::assertArrayHasKey('id', $book);
-            self::assertIsNumeric($book['id']);
-            self::assertArrayHasKey('name', $book);
-            self::assertIsString($book['name']);
-            self::assertArrayHasKey('publicationDate', $book);
-            self::assertIsString($book['publicationDate']);
-        }
     }
 
     public function testRemoveBookUnknownBook(): void
@@ -187,7 +168,7 @@ BD;
         self::assertEquals('1965-05-12', $actualPublicationDate);
 
         $this->httpClient->request(Request::METHOD_POST, '/', [
-            'query' => AuthorTest::authorByIdQuery($authorId),
+            'query' => AuthorResolverTest::authorByIdQuery($authorId),
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
@@ -197,7 +178,7 @@ BD;
         self::assertEquals(1, $numberBooks);
 
         $this->httpClient->request(Request::METHOD_POST, '/', [
-            'query' => AuthorTest::authorByIdQuery($author2Id),
+            'query' => AuthorResolverTest::authorByIdQuery($author2Id),
             'variables' => null,
         ]);
         $response = $this->httpClient->getResponse();
@@ -236,87 +217,5 @@ BD;
         $decodedResponse = json_decode($response->getContent(), true);
         $message = $decodedResponse['errors'][0]['message'] ?? '';
         self::assertEquals("This value is too short. It should have 2 characters or more.\n", $message);
-    }
-
-    private function createBookMutation(string $name, string $description, string $publicationDate, array $authors): array
-    {
-        $authors = implode(',', $authors);
-        return [
-            "query" => "mutation createBook {
-  createBook(book: {name: \"$name\", description: \"$description\", publicationDate: \"$publicationDate\", authors: [$authors]}) {
-    id
-  }
-}
-",
-            "variables" => null,
-            "operationName" => "createBook"
-        ];
-    }
-
-    private function queryBookById(int $id): array
-    {
-        return [
-            "query" => "query GetBook {
-  book (id: $id) {
-    id,
-    name,
-    description,
-    publicationDate,
-    authors {
-        id
-    }
-  }
-}
-",
-            "variables" => null,
-            "operationName" => "GetBook"
-        ];
-    }
-
-    private function queryBooks(): array
-    {
-        return [
-            "query" => "query GetBooks {
-  books {
-    id,
-    name,
-    publicationDate
-  }
-}
-",
-            "variables" => null,
-            "operationName" => "GetBooks"
-        ];
-    }
-
-    private function deleteBookByIdMutation(int $id): array
-    {
-        return [
-            "query" => "mutation DeleteBook {
-  deleteBook(id: $id)
-}
-",
-            "variables" => null,
-            "operationName" => "DeleteBook"
-        ];
-    }
-
-    private function editBookByIdMutation(int $bookId, string $name, string $description, string $publicationDate, array $authors): array
-    {
-        $authors = implode(',', $authors);
-
-        return [
-            "query" => "mutation EditBook {
-  editBook(id: $bookId, book: {name: \"$name\", description: \"$description\", publicationDate: \"$publicationDate\", authors: [$authors]}) {
-    id
-    name
-    description
-    publicationDate
-  }
-}
-",
-            "variables" => null,
-            "operationName" => "EditBook"
-        ];
     }
 }
