@@ -55,7 +55,12 @@ BD;
                     "id" => $id,
                     "name" => $name,
                     "description" => $description,
-                    "publicationDate" => "1865-01-01"
+                    "publicationDate" => "1865-01-01",
+                    "authors" => [
+                        [
+                            "id" => $author->getId()
+                        ],
+                    ],
                 ]
             ]
         ], $decodedResponse);
@@ -256,7 +261,10 @@ BD;
     id,
     name,
     description,
-    publicationDate
+    publicationDate,
+    authors {
+        id
+    }
   }
 }
 ",
