@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\Input\AuthorsFiltersDto;
 use App\Entity\Author;
 use App\Interfaces\Repository\AuthorRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -22,9 +23,16 @@ class AuthorRepository extends ServiceEntityRepository implements AuthorReposito
         return $this->find($id);
     }
 
-    public function findAllAuthors(): array
+    public function findAuthors(AuthorsFiltersDto $filters): array
     {
-        return $this->findAll();
+        $qb = $this->createQueryBuilder('a');
+        if ($filters->name) {
+            $qb->andWhere($qb->expr()->like('LOWER(a.name)', ':name'));
+            $qb->setParameter('name', "$filters->name%");
+        }
+        $qb->orderBy('a.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 
     public function save(Author $author): void

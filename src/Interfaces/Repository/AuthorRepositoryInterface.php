@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Repository;
 
+use App\Dto\Input\AuthorsFiltersDto;
 use App\Entity\Author;
 
 interface AuthorRepositoryInterface
@@ -11,7 +12,7 @@ interface AuthorRepositoryInterface
     /**
      * @return array<int, Author>
      */
-    public function findAllAuthors(): array;
+    public function findAuthors(AuthorsFiltersDto $filters): array;
 
     public function save(Author $author): void;
 

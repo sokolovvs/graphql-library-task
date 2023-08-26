@@ -15,3 +15,9 @@ AuthorData:
     fields:
       name:
         type: String!
+
+AuthorFilters:
+  type: input-object
+  config:
+    fields:
+      name: String!

@@ -25,14 +25,14 @@ trait AuthorTestTrait
 }";
     }
 
-    private function authorsQuery(): string
+    private function authorsQuery(?string $name = null): string
     {
-        return 'query {
-  authors {
+        return "query {
+  authors (filters: {name: \"$name\"}) {
     name,
     numberBooks
   }
-}';
+}";
     }
 
     private function createAuthorMutation(string $name): array

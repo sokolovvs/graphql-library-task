@@ -50,6 +50,8 @@ class AuthorResolverTest extends WebTestCase
 #Naomi Alderman
     public function testGetAuthors(): void
     {
+        $firstAuthorExpected = $this->em->getConnection()
+            ->fetchAllAssociative('SELECT name, number_books FROM authors ORDER BY id ASC LIMIT 1')[0] ?? [];
         $this->httpClient->request(Request::METHOD_POST, '/', [
             'query' => $this->authorsQuery(),
             'variables' => null,
@@ -57,10 +59,26 @@ class AuthorResolverTest extends WebTestCase
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $firstAuthor = $decodedResponse['data']['authors'][0] ?? [];
+        $firstAuthorActual = $decodedResponse['data']['authors'][0] ?? [];
         self::assertEquals([
-            "name" => "Suzanne Collins",
-            "numberBooks" => 0
-        ], $firstAuthor);
+            'name' => $firstAuthorExpected['name'] ?? '',
+            'numberBooks' => $firstAuthorExpected['number_books'] ?? -1,
+        ], $firstAuthorActual);
+    }
+
+    public function testFilterAuthors(): void
+    {
+        $this->addAuthor('Feliks An');
+        $this->addAuthor('Fernando Aguero');
+        $this->addAuthor('Alex');
+        $this->httpClient->request(Request::METHOD_POST, '/', [
+            'query' => $this->authorsQuery('Fe'),
+            'variables' => null,
+        ]);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $authors = $decodedResponse['data']['authors'] ?? [];
+        self::assertCount(2, $authors);
     }
 }

@@ -11,7 +11,10 @@ Query:
         resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::author", args["id"])'
       authors:
         type: "[Author!]!"
-        resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::authors")'
+        args:
+          filters:
+            type: AuthorFilters
+        resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::authors", args["filters"] ?? [])'
       book:
         type: Book!
         args:
