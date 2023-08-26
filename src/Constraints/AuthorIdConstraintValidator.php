@@ -15,7 +15,7 @@ class AuthorIdConstraintValidator extends ConstraintValidator
         $this->authors = $authors;
     }
 
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         $value = (int)$value;
         $author = is_int($value) ? $this->authors->findById($value) : null;
