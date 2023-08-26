@@ -8,6 +8,7 @@ use App\Interfaces\Repository\AuthorRepositoryInterface;
 use App\Interfaces\Service\ErrorFormatterInterface;
 use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 use Overblog\GraphQLBundle\Error\UserError;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthorMutator
@@ -15,21 +16,24 @@ class AuthorMutator
     private AuthorRepositoryInterface $authors;
     private ValidatorInterface $validator;
     private ErrorFormatterInterface $errorFormatter;
+    private SerializerInterface $serializer;
 
     public function __construct(
         AuthorRepositoryInterface $authors,
         ValidatorInterface        $validator,
-        ErrorFormatterInterface   $errorFormatter
+        ErrorFormatterInterface   $errorFormatter,
+        SerializerInterface $serializer
     )
     {
         $this->authors = $authors;
         $this->validator = $validator;
         $this->errorFormatter = $errorFormatter;
+        $this->serializer = $serializer;
     }
 
     public function createAuthor(ArgumentInterface $argument): Author|UserError
     {
-        $dto = new AuthorDto($argument['author']['name'] ?? '');
+        $dto = $this->serializer->deserialize(json_encode($argument['author']), AuthorDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -46,7 +50,7 @@ class AuthorMutator
         if ($author === null) {
             return new UserError("Unknown author #$id");
         }
-        $dto = new AuthorDto($argument['author']['name'] ?? '');
+        $dto = $this->serializer->deserialize(json_encode($argument['author']), AuthorDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));

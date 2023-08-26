@@ -11,6 +11,7 @@ use App\Interfaces\Service\ErrorFormatterInterface;
 use DateTimeImmutable;
 use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 use Overblog\GraphQLBundle\Error\UserError;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BookMutator
@@ -19,28 +20,26 @@ class BookMutator
     private ValidatorInterface $validator;
     private ErrorFormatterInterface $errorFormatter;
     private AuthorRepositoryInterface $authors;
+    private SerializerInterface $serializer;
 
     public function __construct(
         BookRepositoryInterface   $books,
         AuthorRepositoryInterface $authors,
         ValidatorInterface        $validator,
-        ErrorFormatterInterface   $errorFormatter
+        ErrorFormatterInterface   $errorFormatter,
+        SerializerInterface       $serializer
     )
     {
         $this->books = $books;
         $this->authors = $authors;
         $this->validator = $validator;
         $this->errorFormatter = $errorFormatter;
+        $this->serializer = $serializer;
     }
 
     public function createBook(ArgumentInterface $argument): Book|UserError
     {
-        $dto = new BookDto(
-            $argument['book']['name'] ?? '',
-            $argument['book']['authors'] ?? [],
-            $argument['book']['description'] ?? null,
-            $argument['book']['publicationDate'] ?? '',
-        );
+        $dto = $this->serializer->deserialize(json_encode($argument['book']),  BookDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -67,12 +66,7 @@ class BookMutator
             return new UserError("Unknown book#$id");
         }
 
-        $dto = new BookDto(
-            $argument['book']['name'] ?? '',
-            $argument['book']['authors'] ?? [],
-            $argument['book']['description'] ?? null,
-            $argument['book']['publicationDate'] ?? '',
-        );
+        $dto = $this->serializer->deserialize(json_encode($argument['book']),  BookDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
