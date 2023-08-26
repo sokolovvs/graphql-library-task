@@ -11,7 +11,7 @@ use Overblog\GraphQLBundle\Error\UserError;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class AuthorMutator
+final class AuthorMutator
 {
     private AuthorRepositoryInterface $authors;
     private ValidatorInterface $validator;
