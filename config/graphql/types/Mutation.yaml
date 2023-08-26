@@ -1,0 +1,44 @@
+Mutation:
+  type: object
+  config:
+    fields:
+      createAuthor:
+        type: Author!
+        args:
+          author:
+            type: AuthorData!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\AuthorMutator::createAuthor", args)'
+      editAuthor:
+        type: Author!
+        args:
+          id:
+            type: ID!
+          author:
+            type: AuthorData!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\AuthorMutator::editAuthor", args)'
+      deleteAuthor:
+        type: Boolean!
+        args:
+          id:
+            type: ID!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\AuthorMutator::deleteAuthor", args)'
+      createBook:
+        type: Book!
+        args:
+          book:
+            type: BookData!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\BookMutator::createBook", args)'
+      editBook:
+        type: Book!
+        args:
+          id:
+            type: ID!
+          book:
+            type: BookData!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\BookMutator::editBook", args)'
+      deleteBook:
+        type: Boolean!
+        args:
+          id:
+            type: ID!
+        resolve: '@=mutation("App\\GraphQL\\Mutator\\BookMutator::deleteBook", args)'

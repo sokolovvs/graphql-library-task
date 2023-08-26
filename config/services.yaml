@@ -31,9 +31,27 @@ services:
     App\Interfaces\Repository\BookRepositoryInterface:
         alias: App\Repository\BookRepository
 
-    App\GraphQL\Resolver\RootResolverMap:
-      tags:
-        - { name: overblog_graphql.resolver_map, schema: default }
+    App\GraphQL\Resolver\AuthorResolver:
+        tags:
+            - { name: overblog_graphql.query, method: author, alias: author }
+            - { name: overblog_graphql.query, method: authors, alias: authors }
+
+    App\GraphQL\Mutator\AuthorMutator:
+        tags:
+            - { name: overblog_graphql.mutation, method: createAuthor, alias: createAuthor }
+            - { name: overblog_graphql.mutation, method: editAuthor, alias: editAuthor }
+            - { name: overblog_graphql.mutation, method: deleteAuthor, alias: deleteAuthor }
+
+    App\GraphQL\Resolver\BookResolver:
+        tags:
+            - { name: overblog_graphql.query, method: book, alias: book }
+            - { name: overblog_graphql.query, method: books, alias: books }
+
+    App\GraphQL\Mutator\BookMutator:
+        tags:
+            - { name: overblog_graphql.mutation, method: createBook, alias: createBook }
+            - { name: overblog_graphql.mutation, method: editBook, alias: editBook }
+            - { name: overblog_graphql.mutation, method: deleteBook, alias: deleteBook }
 
     App\EventListener\AuthorBooksEventListener:
       tags:

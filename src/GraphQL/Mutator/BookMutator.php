@@ -33,7 +33,7 @@ class BookMutator
         $this->errorFormatter = $errorFormatter;
     }
 
-    public function create(ArgumentInterface $argument): Book|UserError
+    public function createBook(ArgumentInterface $argument): Book|UserError
     {
         $dto = new BookDto(
             $argument['book']['name'] ?? '',
@@ -60,7 +60,7 @@ class BookMutator
         return $book;
     }
 
-    public function edit(ArgumentInterface $argument): Book|UserError
+    public function editBook(ArgumentInterface $argument): Book|UserError
     {
         $book = $this->books->findById($id = $argument['id'] ?? -1);
         if ($book === null) {
@@ -98,7 +98,7 @@ class BookMutator
         return $book;
     }
 
-    public function delete(ArgumentInterface $argument): bool|UserError
+    public function deleteBook(ArgumentInterface $argument): bool|UserError
     {
         $id = (int)$argument['id'];
 

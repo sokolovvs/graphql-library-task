@@ -1,9 +1,0 @@
-type RootMutation {
-    createAuthor(author: AuthorData!): Author!
-    editAuthor(id: ID!, author: AuthorData!): Author!
-    deleteAuthor(id: ID!): Boolean!
-
-    createBook(book: BookData!): Book!
-    editBook(id: ID!, book: BookData!): Book!
-    deleteBook(id: ID!): Boolean!
-}

@@ -27,7 +27,7 @@ class AuthorMutator
         $this->errorFormatter = $errorFormatter;
     }
 
-    public function create(ArgumentInterface $argument): Author|UserError
+    public function createAuthor(ArgumentInterface $argument): Author|UserError
     {
         $dto = new AuthorDto($argument['author']['name'] ?? '');
         $violationList = $this->validator->validate($dto);
@@ -40,7 +40,7 @@ class AuthorMutator
         return $author;
     }
 
-    public function edit(ArgumentInterface $argument): Author|UserError
+    public function editAuthor(ArgumentInterface $argument): Author|UserError
     {
         $author = $this->authors->findById($id = $argument['id'] ?? -1);
         if ($author === null) {
@@ -52,11 +52,12 @@ class AuthorMutator
             return new UserError($this->errorFormatter->format($violationList));
         }
         $author->updateName($dto->name);
+//        $this->authors->save($author);
 
         return $author;
     }
 
-    public function delete(ArgumentInterface $argument): bool|UserError
+    public function deleteAuthor(ArgumentInterface $argument): bool|UserError
     {
         $author = $this->authors->findById($id = $argument['id'] ?? -1);
         if ($author === null) {

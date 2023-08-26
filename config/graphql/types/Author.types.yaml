@@ -1,0 +1,17 @@
+Author:
+  type: object
+  config:
+    fields:
+      id:
+        type: ID!
+      name:
+        type: String!
+      numberBooks:
+        type: Int!
+
+AuthorData:
+  type: input-object
+  config:
+    fields:
+      name:
+        type: String!

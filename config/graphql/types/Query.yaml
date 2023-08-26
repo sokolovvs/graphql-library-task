@@ -1,0 +1,24 @@
+Query:
+  type: object
+  config:
+    fields:
+      author:
+        type: Author!
+        args:
+          id:
+            type: Int!
+            description: "The id of the author"
+        resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::author", args["id"])'
+      authors:
+        type: "[Author!]!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::authors")'
+      book:
+        type: Book!
+        args:
+          id:
+            type: Int!
+            description: "The id of the book"
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::book", args["id"])'
+      books:
+        type: "[Book!]!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::books")'
