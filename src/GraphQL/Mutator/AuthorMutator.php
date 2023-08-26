@@ -52,7 +52,7 @@ class AuthorMutator
             return new UserError($this->errorFormatter->format($violationList));
         }
         $author->updateName($dto->name);
-//        $this->authors->save($author);
+        $this->authors->save($author);
 
         return $author;
     }
