@@ -9,7 +9,6 @@ use App\Interfaces\Repository\AuthorRepositoryInterface;
 use App\Interfaces\Repository\BookRepositoryInterface;
 use App\Interfaces\Service\ErrorFormatterInterface;
 use DateTimeImmutable;
-use Overblog\GraphQLBundle\Definition\ArgumentInterface;
 use Overblog\GraphQLBundle\Error\UserError;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -37,9 +36,9 @@ class BookMutator
         $this->serializer = $serializer;
     }
 
-    public function createBook(ArgumentInterface $argument): Book|UserError
+    public function createBook(array $data): Book|UserError
     {
-        $dto = $this->serializer->deserialize(json_encode($argument['book']),  BookDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), BookDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -59,14 +58,14 @@ class BookMutator
         return $book;
     }
 
-    public function editBook(ArgumentInterface $argument): Book|UserError
+    public function editBook(int $id, array $data): Book|UserError
     {
-        $book = $this->books->findById($id = $argument['id'] ?? -1);
+        $book = $this->books->findById($id);
         if ($book === null) {
             return new UserError("Unknown book#$id");
         }
 
-        $dto = $this->serializer->deserialize(json_encode($argument['book']),  BookDto::class, 'json');
+        $dto = $this->serializer->deserialize(json_encode($data), BookDto::class, 'json');
         $violationList = $this->validator->validate($dto);
         if ($violationList->count()) {
             return new UserError($this->errorFormatter->format($violationList));
@@ -92,10 +91,8 @@ class BookMutator
         return $book;
     }
 
-    public function deleteBook(ArgumentInterface $argument): bool|UserError
+    public function deleteBook(int $id): bool|UserError
     {
-        $id = (int)$argument['id'];
-
         $book = $this->books->findById($id);
         if ($book === null) {
             return new UserError("Unknown book#$id");
