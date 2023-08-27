@@ -46,6 +46,7 @@ final class BookResolver
             return new UserError($this->errorFormatter->format($violationList));
         }
 
-            return array_map(fn(Book $book) => BookDto::fromBookEntity($book), $this->books->findBooks($filters));
+
+        return array_map(fn(Book $book) => BookDto::fromBookEntity($book), $this->books->findBooks($filters));
     }
 }
