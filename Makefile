@@ -11,4 +11,4 @@ test:
 	php bin/console doctrine:migrations:migrate --env="test" --no-interaction
 	php bin/phpunit
 fixtures:
-	php bin/console php bin/console doctrine:fixtures:load
+	php bin/console doctrine:fixtures:load
