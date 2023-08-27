@@ -91,6 +91,8 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "fzaninotto/faker": "^1.5",
         "overblog/graphiql-bundle": "^0.3.0",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.3.*",
