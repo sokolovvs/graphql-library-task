@@ -2,8 +2,10 @@
 
 namespace App\Dto\Input;
 
+use App\Constraints\BooksSearchingFilterConstraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[BooksSearchingFilterConstraint]
 final class BooksFiltersDto
 {
     #[Assert\Length(max: 256)]
