@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\Input\BooksFiltersDto;
 use App\Entity\Book;
 use App\Interfaces\Repository\BookRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -27,9 +28,28 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
         return $this->find($id);
     }
 
-    public function findAllBooks(): array
+    public function findBooks(BooksFiltersDto $filters): array
     {
-        return $this->findAll();
+        $qb = $this->createQueryBuilder('b');
+        if ($filters->name) {
+            $qb->andWhere($qb->expr()->like('LOWER(b.name)', ':name'));
+            $qb->setParameter('name', "$filters->name%");
+        }
+        if ($filters->description) {
+            $qb->andWhere($qb->expr()->like('LOWER(b.description)', ':description'));
+            $qb->setParameter('description', "$filters->description%");
+        }
+        if ($filters->minPublicationDate) {
+            $qb->andWhere($qb->expr()->gte('b.publicationDate', ':minPublicationDate'));
+            $qb->setParameter('minPublicationDate', "$filters->minPublicationDate");
+        }
+        if ($filters->maxPublicationDate) {
+            $qb->andWhere($qb->expr()->lte('b.publicationDate', ':maxPublicationDate'));
+            $qb->setParameter('maxPublicationDate', "$filters->maxPublicationDate");
+        }
+        $qb->orderBy('b.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
     }
 
     public function save(Book $book): void

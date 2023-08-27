@@ -22,3 +22,11 @@ BookData:
       publicationDate: String
       authors: '[ID!]!'
 
+BooksFilters:
+  type: input-object
+  config:
+    fields:
+      name: String
+      description: String
+      minPublicationDate: String
+      maxPublicationDate: String

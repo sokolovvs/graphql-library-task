@@ -2,6 +2,7 @@
 
 namespace App\Interfaces\Repository;
 
+use App\Dto\Input\BooksFiltersDto;
 use App\Entity\Book;
 
 interface BookRepositoryInterface
@@ -11,7 +12,7 @@ interface BookRepositoryInterface
     /**
      * @return array<int, Book>
      */
-    public function findAllBooks(): array;
+    public function findBooks(BooksFiltersDto $filters): array;
 
     public function save(Book $book): void;
 

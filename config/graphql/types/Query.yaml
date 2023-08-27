@@ -24,4 +24,7 @@ Query:
         resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::book", args["id"])'
       books:
         type: "[Book!]!"
-        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::books")'
+        args:
+          filters:
+            type: BooksFilters
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::books", args["filters"] ?? [])'
