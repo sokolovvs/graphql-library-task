@@ -22,7 +22,7 @@ final class BookDto
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
-        $this->publicationDate = $publicationDate->format('Y-m-d');
+        $this->publicationDate = $publicationDate?->format('Y-m-d');
         $this->authors = $authors;
     }
 
