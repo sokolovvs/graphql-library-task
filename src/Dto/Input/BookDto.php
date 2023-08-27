@@ -3,6 +3,7 @@
 namespace App\Dto\Input;
 
 use App\Constraints\AuthorIdConstraint;
+use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -15,6 +16,9 @@ final class BookDto
     public readonly ?string $description;
 
     #[Assert\Date]
+    #[Assert\When(expression: 'this.publicationDate !== ""', constraints: [
+        new Assert\LessThanOrEqual(new DateTimeImmutable('today')),
+    ])]
     public readonly ?string $publicationDate;
     #[Assert\NotBlank()]
     #[Assert\All([
