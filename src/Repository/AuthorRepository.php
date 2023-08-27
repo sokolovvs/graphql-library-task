@@ -30,6 +30,9 @@ class AuthorRepository extends ServiceEntityRepository implements AuthorReposito
             $qb->andWhere($qb->expr()->like('LOWER(a.name)', ':name'));
             $qb->setParameter('name', "$filters->name%");
         }
+        $qb->setFirstResult(($filters->page - 1) * $filters->limit)
+            ->setMaxResults($filters->limit);
+
         $qb->orderBy('a.id', 'ASC');
 
         return $qb->getQuery()->getResult();

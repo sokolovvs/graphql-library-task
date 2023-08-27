@@ -20,4 +20,6 @@ AuthorFilters:
   type: input-object
   config:
     fields:
-      name: String!
+      name: String
+      page: Int
+      limit: Int
