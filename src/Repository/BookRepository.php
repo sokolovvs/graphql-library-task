@@ -47,6 +47,8 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
             $qb->andWhere($qb->expr()->lte('b.publicationDate', ':maxPublicationDate'));
             $qb->setParameter('maxPublicationDate', "$filters->maxPublicationDate");
         }
+        $qb->setFirstResult(($filters->page - 1) * $filters->limit)
+            ->setMaxResults($filters->limit);
         $qb->orderBy('b.id', 'ASC');
 
         return $qb->getQuery()->getResult();

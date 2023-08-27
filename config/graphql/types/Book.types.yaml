@@ -30,3 +30,5 @@ BooksFilters:
       description: String
       minPublicationDate: String
       maxPublicationDate: String
+      page: Int
+      limit: Int
