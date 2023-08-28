@@ -31,8 +31,8 @@ final class BooksFiltersDto
         int $limit = 25
     )
     {
-        $this->name = mb_strtolower(trim($name));
-        $this->description = mb_strtolower(trim($description));
+        $this->name = mb_strtolower(trim($name ?? ''));
+        $this->description = mb_strtolower(trim($description ?? ''));
         $this->minPublicationDate = $minPublicationDate;
         $this->maxPublicationDate = $maxPublicationDate;
         $this->page = $page;

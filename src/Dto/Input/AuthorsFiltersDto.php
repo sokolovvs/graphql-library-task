@@ -15,7 +15,7 @@ final class AuthorsFiltersDto
 
     public function __construct(?string $name, int $page = 1, int $limit = 25)
     {
-        $this->name = mb_strtolower(trim($name));
+        $this->name = mb_strtolower(trim($name ?? ''));
         $this->page = $page;
         $this->limit = $limit;
     }
