@@ -14,6 +14,8 @@ interface AuthorRepositoryInterface
      */
     public function findAuthors(AuthorsFiltersDto $filters): array;
 
+    public function countAuthors(AuthorsFiltersDto $filters): int;
+
     public function save(Author $author): void;
 
     public function remove(Author $author): void;

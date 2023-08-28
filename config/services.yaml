@@ -35,6 +35,7 @@ services:
         tags:
             - { name: overblog_graphql.query, method: author, alias: author }
             - { name: overblog_graphql.query, method: authors, alias: authors }
+            - { name: overblog_graphql.query, method: countAuthors, alias: countAuthors }
 
     App\GraphQL\Mutator\AuthorMutator:
         tags:

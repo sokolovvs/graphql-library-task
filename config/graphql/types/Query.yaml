@@ -15,6 +15,12 @@ Query:
           filters:
             type: AuthorFilters
         resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::authors", args["filters"] ?? [])'
+      countAuthors:
+        type: Int!
+        args:
+          filters:
+            type: AuthorFilters
+        resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::countAuthors", args["filters"] ?? [])'
       book:
         type: Book!
         args:
