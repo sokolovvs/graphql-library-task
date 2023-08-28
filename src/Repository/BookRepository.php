@@ -6,6 +6,7 @@ use App\Dto\Input\BooksFiltersDto;
 use App\Entity\Book;
 use App\Interfaces\Repository\BookRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -30,6 +31,36 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
 
     public function findBooks(BooksFiltersDto $filters): array
     {
+        $qb = $this->filterBooksQueryBuilder($filters);
+        $qb->setFirstResult(($filters->page - 1) * $filters->limit)
+            ->setMaxResults($filters->limit);
+        $qb->orderBy('b.id', 'ASC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countBooks(BooksFiltersDto $filters): int
+    {
+        $qb = $this->filterBooksQueryBuilder($filters);
+        $qb->select('COUNT(b.id)');
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function save(Book $book): void
+    {
+        $this->_em->persist($book);
+        $this->_em->flush();
+    }
+
+    public function remove(Book $book): void
+    {
+        $this->_em->remove($book);
+        $this->_em->flush();
+    }
+
+    private function filterBooksQueryBuilder(BooksFiltersDto $filters): QueryBuilder
+    {
         $qb = $this->createQueryBuilder('b');
         if ($filters->name) {
             $qb->andWhere($qb->expr()->like('LOWER(b.name)', ':name'));
@@ -47,22 +78,7 @@ class BookRepository extends ServiceEntityRepository implements BookRepositoryIn
             $qb->andWhere($qb->expr()->lte('b.publicationDate', ':maxPublicationDate'));
             $qb->setParameter('maxPublicationDate', "$filters->maxPublicationDate");
         }
-        $qb->setFirstResult(($filters->page - 1) * $filters->limit)
-            ->setMaxResults($filters->limit);
-        $qb->orderBy('b.id', 'ASC');
 
-        return $qb->getQuery()->getResult();
-    }
-
-    public function save(Book $book): void
-    {
-        $this->_em->persist($book);
-        $this->_em->flush();
-    }
-
-    public function remove(Book $book): void
-    {
-        $this->_em->remove($book);
-        $this->_em->flush();
+        return $qb;
     }
 }

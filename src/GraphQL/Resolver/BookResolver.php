@@ -46,7 +46,17 @@ final class BookResolver
             return new UserError($this->errorFormatter->format($violationList));
         }
 
-
         return array_map(fn(Book $book) => BookDto::fromBookEntity($book), $this->books->findBooks($filters));
+    }
+
+    public function countBooks(array $filters): int|UserError
+    {
+        $filters = $this->serializer->deserialize(json_encode($filters), BooksFiltersDto::class, 'json');
+        $violationList = $this->validator->validate($filters);
+        if ($violationList->count()) {
+            return new UserError($this->errorFormatter->format($violationList));
+        }
+
+        return $this->books->countBooks($filters);
     }
 }

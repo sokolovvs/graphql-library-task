@@ -34,3 +34,9 @@ Query:
           filters:
             type: BooksFilters
         resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::books", args["filters"] ?? [])'
+      countBooks:
+        type: Int!
+        args:
+          filters:
+            type: BooksFilters
+        resolve: '@=query("App\\GraphQL\\Resolver\\BookResolver::countBooks", args["filters"] ?? [])'

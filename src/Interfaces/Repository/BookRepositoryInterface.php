@@ -14,6 +14,8 @@ interface BookRepositoryInterface
      */
     public function findBooks(BooksFiltersDto $filters): array;
 
+    public function countBooks(BooksFiltersDto $filters): int;
+
     public function save(Book $book): void;
 
     public function remove(Book $book): void;

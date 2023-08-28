@@ -47,6 +47,7 @@ services:
         tags:
             - { name: overblog_graphql.query, method: book, alias: book }
             - { name: overblog_graphql.query, method: books, alias: books }
+            - { name: overblog_graphql.query, method: countBooks, alias: countBooks }
 
     App\GraphQL\Mutator\BookMutator:
         tags:
