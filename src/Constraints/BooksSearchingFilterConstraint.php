@@ -15,7 +15,7 @@ class BooksSearchingFilterConstraint extends Constraint
         return static::class.'Validator';
     }
 
-    public function getTargets()
+    public function getTargets(): array
     {
         return [self::CLASS_CONSTRAINT];
     }
