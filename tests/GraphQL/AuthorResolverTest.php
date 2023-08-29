@@ -80,5 +80,15 @@ class AuthorResolverTest extends WebTestCase
         $decodedResponse = json_decode($response->getContent(), true);
         $authors = $decodedResponse['data']['authors'] ?? [];
         self::assertCount(2, $authors);
+
+        $this->httpClient->request(Request::METHOD_POST, '/', [
+            'query' => $this->authorsCountQuery('Fe'),
+            'variables' => null,
+        ]);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $authorsQty = $decodedResponse['data']['countAuthors'] ?? -1;
+        self::assertEquals(2, $authorsQty);
     }
 }

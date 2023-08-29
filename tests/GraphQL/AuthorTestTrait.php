@@ -35,6 +35,13 @@ trait AuthorTestTrait
 }";
     }
 
+    private function authorsCountQuery(?string $name = null): string
+    {
+        return "query {
+  countAuthors (filters: {name: \"$name\"})
+}";
+    }
+
     private function createAuthorMutation(string $name): array
     {
         return [
