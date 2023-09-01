@@ -2,6 +2,8 @@
 
 namespace App\Tests\GraphQL;
 
+use App\Entity\Book;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
@@ -117,11 +119,16 @@ class AuthorMutatorTest extends WebTestCase
     public function testDeleteAuthor(): void
     {
         $author = $this->addAuthor('Erica H.');
+        $author2 = $this->addAuthor('Schindler M');
+        $book = new Book('SGU', 'some description', new DateTimeImmutable('2002-05-09'), ...[$author, $author2]);
+        $this->em->persist($book);
+        $this->em->flush();
+        $bookId = $book->getId();
+
         $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteAuthorMutation($authorId = $author->getId()));
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
         self::assertEquals([
             "data" => [
                 "deleteAuthor" => true
@@ -133,5 +140,12 @@ class AuthorMutatorTest extends WebTestCase
         $decodedResponse = json_decode($response->getContent(), true);
         $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
         self::assertEquals("Unknown author #$authorId", $actualMessage);
+
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->deleteAuthorMutation($author2Id = $author2->getId()));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
+        self::assertEquals("Can not remove author#$author2Id because book#$bookId has not another author. Book must has min 1 author", $actualMessage);
     }
 }
