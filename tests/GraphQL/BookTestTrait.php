@@ -78,6 +78,10 @@ trait BookTestTrait
     name
     description
     publicationDate
+    authors {
+        id,
+        name
+    }
   }
 }
 ",

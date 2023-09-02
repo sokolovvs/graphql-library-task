@@ -142,6 +142,8 @@ BD;
         $this->em->flush();
         $this->em->persist($author2 = new Author('Lewis Carroll'));
         $this->em->flush();
+        $this->em->persist($author3 = new Author('Ali Hazelwood'));
+        $this->em->flush();
         $name = 'Alice in Wonderland';
         $description = self::BOOK_DESCRIPTION;
         $request = $this->createBookMutation($name, $description, '1865-01-01', [$authorId = $author->getId(), $author2Id = $author2->getId()]);
@@ -153,7 +155,7 @@ BD;
 
         $name = 'In the Heart of the Sea';
         $description = 'some description';
-        $request = $this->editBookByIdMutation($id, $name, $description, '1965-05-12', [$authorId,]);
+        $request = $this->editBookByIdMutation($id, $name, $description, '1965-05-12', [$authorId, $author3->getId()]);
         $this->httpClient->request(Request::METHOD_POST, '/', $request);
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -162,10 +164,21 @@ BD;
         $actualName = $decodedResponse['data']['editBook']['name'] ?? '';
         $actualDescription = $decodedResponse['data']['editBook']['description'] ?? '';
         $actualPublicationDate = $decodedResponse['data']['editBook']['publicationDate'] ?? '';
+        $actualAuthors = $decodedResponse['data']['editBook']['authors'] ?? [];
         self::assertEquals($id, $actualId);
         self::assertEquals($name, $actualName);
         self::assertEquals($description, $actualDescription);
         self::assertEquals('1965-05-12', $actualPublicationDate);
+        self::assertEquals([
+            [
+                'id' => $author->getId(),
+                'name' => $author->getName(),
+            ],
+            [
+                'id' => $author3->getId(),
+                'name' => $author3->getName(),
+            ]
+        ], $actualAuthors);
 
         $this->httpClient->request(Request::METHOD_POST, '/', [
             'query' => AuthorResolverTest::authorByIdQuery($authorId),
