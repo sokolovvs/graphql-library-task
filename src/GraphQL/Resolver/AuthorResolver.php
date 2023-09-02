@@ -52,10 +52,6 @@ final class AuthorResolver
     public function countAuthors(array $filters): int|UserError
     {
         $filters = $this->serializer->deserialize(json_encode($filters), AuthorsFiltersDto::class, 'json');
-        $violationList = $this->validator->validate($filters);
-        if ($violationList->count()) {
-            return new UserError($this->errorFormatter->format($violationList));
-        }
 
         return $this->authors->countAuthors($filters);
     }
