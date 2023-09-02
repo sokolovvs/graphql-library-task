@@ -25,20 +25,37 @@ trait AuthorTestTrait
 }";
     }
 
-    private function authorsQuery(?string $name = null): string
+    private static function authorsQuery(array $filters = []): string
     {
+        $inlineFilters = self::inlineFilters($filters);
         return "query {
-  authors (filters: {name: \"$name\"}) {
+  authors $inlineFilters {
     name,
     numberBooks
   }
 }";
     }
 
-    private function authorsCountQuery(?string $name = null): string
+    private static function inlineFilters(array $filters = []): string {
+        $inlineFilters = '';
+        if (!empty($filters)) {
+            $inlineFilters = '{';
+            foreach ($filters as $key => $value) {
+                $value = is_numeric($value) ? $value : "\"$value\"";
+                $inlineFilters .= "$key: $value";
+            }
+            $inlineFilters .= '}';
+            $inlineFilters = "(filters: $inlineFilters)";
+        }
+
+        return $inlineFilters;
+    }
+
+    private static function authorsCountQuery(array $filters = []): string
     {
+        $inlineFilters = self::inlineFilters($filters);
         return "query {
-  countAuthors (filters: {name: \"$name\"})
+  countAuthors $inlineFilters
 }";
     }
 
