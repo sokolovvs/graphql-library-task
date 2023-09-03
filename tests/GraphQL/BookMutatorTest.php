@@ -180,6 +180,13 @@ BD;
             ]
         ], $actualAuthors);
 
+        $request = $this->editBookByIdMutation($id, $name, $description, '1965-05-12', []);
+        $this->httpClient->request(Request::METHOD_POST, '/', $request);
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        self::assertEquals("This value should not be blank.\n", $decodedResponse['errors'][0]['message'] ?? '');
+
         $this->httpClient->request(Request::METHOD_POST, '/', [
             'query' => AuthorResolverTest::authorByIdQuery($authorId),
             'variables' => null,
