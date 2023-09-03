@@ -3,17 +3,15 @@
 namespace App\Constraints;
 
 use App\Dto\Input\BooksFiltersDto;
-use LogicException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Webmozart\Assert\Assert;
 
 class BooksSearchingFilterConstraintValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$value instanceof BooksFiltersDto) {
-            throw new LogicException('Invalid constraint usage');
-        }
+        Assert::isInstanceOf($value, BooksFiltersDto::class, 'Invalid constraint usage: ' . self::class);
         $allFieldsAreEmpty = empty($value->description) && empty($value->minPublicationDate) && empty($value->maxPublicationDate) && empty($value->name);
         if ($allFieldsAreEmpty) {
             return;
