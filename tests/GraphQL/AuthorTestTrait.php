@@ -3,6 +3,7 @@
 namespace App\Tests\GraphQL;
 
 use App\Entity\Author;
+use App\Tests\Utils\GraphQLUtil;
 
 trait AuthorTestTrait
 {
@@ -27,7 +28,7 @@ trait AuthorTestTrait
 
     private static function authorsQuery(array $filters = []): string
     {
-        $inlineFilters = self::inlineFilters($filters);
+        $inlineFilters = GraphQLUtil::inlineFilters($filters);
         return "query {
   authors $inlineFilters {
     name,
@@ -36,24 +37,9 @@ trait AuthorTestTrait
 }";
     }
 
-    private static function inlineFilters(array $filters = []): string {
-        $inlineFilters = '';
-        if (!empty($filters)) {
-            $inlineFilters = '{';
-            foreach ($filters as $key => $value) {
-                $value = is_numeric($value) ? $value : "\"$value\"";
-                $inlineFilters .= "$key: $value";
-            }
-            $inlineFilters .= '}';
-            $inlineFilters = "(filters: $inlineFilters)";
-        }
-
-        return $inlineFilters;
-    }
-
     private static function authorsCountQuery(array $filters = []): string
     {
-        $inlineFilters = self::inlineFilters($filters);
+        $inlineFilters = GraphQLUtil::inlineFilters($filters);
         return "query {
   countAuthors $inlineFilters
 }";

@@ -2,6 +2,8 @@
 
 namespace App\Tests\GraphQL;
 
+use App\Tests\Utils\GraphQLUtil;
+
 trait BookTestTrait
 {
     private function createBookMutation(string $name, string $description, string $publicationDate, array $authors): array
@@ -39,19 +41,37 @@ trait BookTestTrait
         ];
     }
 
-    private function queryBooks(): array
+    private static function queryBooks(array $filters = []): array
     {
+        $filters = GraphQLUtil::inlineFilters($filters);
         return [
             "query" => "query GetBooks {
-  books {
+  books $filters {
     id,
     name,
     publicationDate
+    authors {
+        id,
+        name
+    }
   }
 }
 ",
             "variables" => null,
             "operationName" => "GetBooks"
+        ];
+    }
+
+    private static function countBooks(array $filters = []): array
+    {
+        $filters = GraphQLUtil::inlineFilters($filters);
+        return [
+            "query" => "query countBooks {
+  countBooks $filters
+}
+",
+            "variables" => null,
+            "operationName" => "countBooks"
         ];
     }
 
