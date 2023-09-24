@@ -1,4 +1,7 @@
 overblog_graphql:
+  errors_handler:
+    enabled: true
+    debug: false
   definitions:
     schema:
       query: Query

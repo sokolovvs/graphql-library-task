@@ -14,12 +14,14 @@ Query:
         args:
           filters:
             type: AuthorFilters
+            validation: cascade
         resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::authors", args["filters"] ?? [])'
       countAuthors:
         type: Int!
         args:
           filters:
             type: AuthorFilters
+            validation: cascade
         resolve: '@=query("App\\GraphQL\\Resolver\\AuthorResolver::countAuthors", args["filters"] ?? [])'
       book:
         type: Book!

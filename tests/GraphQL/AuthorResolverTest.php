@@ -111,29 +111,137 @@ class AuthorResolverTest extends WebTestCase
     {
         yield '<authors> limit can not be greater than 200' => [
             self::authorsQuery(['limit' => 201],), function (array $decodedResponse) {
-                $actual = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("This value should be less than or equal to 200.\n", $actual);
+                $expected = [
+                    "errors" => [
+                        [
+                            "message" => "validation",
+                            "locations" => [
+                                [
+                                    "line" => 2,
+                                    "column" => 3
+                                ]
+                            ],
+                            "path" => [
+                                "authors"
+                            ],
+                            "extensions" => [
+                                "validation" => [
+                                    "filters.limit" => [
+                                        [
+                                            "message" => "This value should be less than or equal to 200.",
+                                            "code" => "30fbb013-d015-4232-8b3b-8f3be97a7e14"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+                self::assertEquals($expected, $decodedResponse);
             }
         ];
 
         yield '<authors> limit can not be less than 5' => [
             self::authorsQuery(['limit' => 4],), function (array $decodedResponse) {
-                $actual = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("This value should be greater than or equal to 5.\n", $actual);
+                $expected = [
+                    "errors" => [
+                        [
+                            "message" => "validation",
+                            "locations" => [
+                                [
+                                    "line" => 2,
+                                    "column" => 3
+                                ]
+                            ],
+                            "path" => [
+                                "authors"
+                            ],
+                            "extensions" => [
+                                "validation" => [
+                                    "filters.limit" => [
+                                        [
+                                            "message" => "This value should be greater than or equal to 5.",
+                                            "code" => "ea4e51d1-3342-48bd-87f1-9e672cd90cad"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+                self::assertEquals($expected, $decodedResponse);
             }
         ];
 
         yield '<authors> page can not be less than 1' => [
             self::authorsQuery(['page' => -1],), function (array $decodedResponse) {
-                $actual = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("This value should be greater than or equal to 1.\n", $actual);
+                $expected = [
+                    "errors" => [
+                        [
+                            "message" => "validation",
+                            "locations" => [
+                                [
+                                    "line" => 2,
+                                    "column" => 3
+                                ]
+                            ],
+                            "path" => [
+                                "authors"
+                            ],
+                            "extensions" => [
+                                "validation" => [
+                                    "filters.page" => [
+                                        [
+                                            "message" => "This value should be greater than or equal to 1.",
+                                            "code" => "ea4e51d1-3342-48bd-87f1-9e672cd90cad"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+                self::assertEquals($expected, $decodedResponse);
             }
         ];
 
         yield '<authors> composite' => [
             self::authorsQuery(['page' => -111111, 'limit' => 2011],), function (array $decodedResponse) {
-                $actual = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("This value should be greater than or equal to 1.\nThis value should be less than or equal to 200.\n", $actual);
+                $expected = [
+                    "errors" => [
+                        [
+                            "message" => "validation",
+                            "locations" => [
+                                [
+                                    "line" => 2,
+                                    "column" => 3
+                                ]
+                            ],
+                            "path" => [
+                                "authors"
+                            ],
+                            "extensions" => [
+                                "validation" => [
+                                    "filters.page" => [
+                                        [
+                                            "message" => "This value should be greater than or equal to 1.",
+                                            "code" => "ea4e51d1-3342-48bd-87f1-9e672cd90cad"
+                                        ]
+                                    ],
+                                    "filters.limit" => [
+                                        [
+                                            "message" => "This value should be less than or equal to 200.",
+                                            "code" => "30fbb013-d015-4232-8b3b-8f3be97a7e14"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+
+
+                self::assertEquals($expected, $decodedResponse);
             }
         ];
     }

@@ -20,6 +20,14 @@ AuthorFilters:
   type: input-object
   config:
     fields:
-      name: String
-      page: Int
-      limit: Int
+      name:
+        type: String
+      page:
+        type: Int
+        validation:
+          - GreaterThanOrEqual: 1
+      limit:
+        type: Int
+        validation:
+          - GreaterThanOrEqual: 5
+          - LessThanOrEqual: 200
