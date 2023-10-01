@@ -7,6 +7,7 @@ Mutation:
         args:
           author:
             type: AuthorData!
+            validation: cascade
         resolve: '@=mutation("App\\GraphQL\\Mutator\\AuthorMutator::createAuthor", args["author"])'
       editAuthor:
         type: Author!
@@ -15,6 +16,7 @@ Mutation:
             type: Int!
           author:
             type: AuthorData!
+            validation: cascade
         resolve: '@=mutation("App\\GraphQL\\Mutator\\AuthorMutator::editAuthor", args["id"], args["author"])'
       deleteAuthor:
         type: Boolean!

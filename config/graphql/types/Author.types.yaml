@@ -15,6 +15,12 @@ AuthorData:
     fields:
       name:
         type: String!
+        validation:
+          - NotBlank: ~
+          - Length:
+              min: 2
+              max: 128
+              normalizer: trim
 
 AuthorFilters:
   type: input-object

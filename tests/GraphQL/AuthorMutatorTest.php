@@ -58,20 +58,75 @@ class AuthorMutatorTest extends WebTestCase
     /**
      * @dataProvider createAuthorFailCases
      */
-    public function testCreateAuthorFailCases(string $name, string $expectedMessage): void
+    public function testCreateAuthorFailCases(string $name, array $expectedResponse): void
     {
         $this->httpClient->request(Request::METHOD_POST, '/', $this->createAuthorMutation($name));
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $message = $decodedResponse['errors'][0]['message'] ?? '';
-        self::assertEquals($expectedMessage, $message);
+        self::assertEquals($expectedResponse, $decodedResponse);
     }
 
     public function createAuthorFailCases(): iterable
     {
-        yield 'input error if name is too short' => [' S   ', 'This value is too short. It should have 2 characters or more.' . PHP_EOL];
-        yield 'input error if name is too long' => [str_repeat('A', 1222), 'This value is too long. It should have 128 characters or less.' . PHP_EOL];
+        yield 'input error if name is too short' => [
+            ' S   ',
+            [
+                "errors" => [
+                    [
+                        "message" => "validation",
+                        "locations" => [
+                            [
+                                "line" => 2,
+                                "column" => 3
+                            ]
+                        ],
+                        "path" => [
+                            "createAuthor"
+                        ],
+                        "extensions" => [
+                            "validation" => [
+                                "author.name" => [
+                                    [
+                                        "message" => "This value is too short. It should have 2 characters or more.",
+                                        "code" => "9ff3fdc4-b214-49db-8718-39c315e33d45"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        yield 'input error if name is too long' => [
+            str_repeat('A', 1222),
+            [
+                "errors" => [
+                    [
+                        "message" => "validation",
+                        "locations" => [
+                            [
+                                "line" => 2,
+                                "column" => 3
+                            ]
+                        ],
+                        "path" => [
+                            "createAuthor"
+                        ],
+                        "extensions" => [
+                            "validation" => [
+                                "author.name" => [
+                                    [
+                                        "message" => "This value is too long. It should have 128 characters or less.",
+                                        "code" => "d94b19cc-114f-4f44-9cc4-4138e80a87b9"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     public function testUpdateAuthor(): void
@@ -102,8 +157,33 @@ class AuthorMutatorTest extends WebTestCase
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $actualMessage = $decodedResponse['errors'][0]['message'] ?? '';
-        self::assertEquals('This value is too short. It should have 2 characters or more.' . PHP_EOL, $actualMessage);
+        self::assertEquals(
+            [
+                "errors" => [
+                    [
+                        "message" => "validation",
+                        "locations" => [
+                            [
+                                "line" => 2,
+                                "column" => 3
+                            ]
+                        ],
+                        "path" => [
+                            "editAuthor"
+                        ],
+                        "extensions" => [
+                            "validation" => [
+                                "author.name" => [
+                                    [
+                                        "message" => "This value is too short. It should have 2 characters or more.",
+                                        "code" => "9ff3fdc4-b214-49db-8718-39c315e33d45"
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ], $decodedResponse);
     }
 
     public function testDeleteUnknownAuthor(): void
