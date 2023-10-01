@@ -25,10 +25,34 @@ BookData:
 BooksFilters:
   type: input-object
   config:
+    validation:
+      - App\Constraints\BooksSearchingFilterConstraint: ~
     fields:
-      name: String
-      description: String
-      minPublicationDate: String
-      maxPublicationDate: String
-      page: Int
-      limit: Int
+      name:
+        type: String
+        validation:
+          - Length:
+              max: 256
+      description:
+        type: String
+        validation:
+          - Length:
+              max: 1024
+      minPublicationDate:
+        type: String
+        validation:
+          - Date: ~
+      maxPublicationDate:
+        type: String
+        validation:
+          - Date: ~
+      page:
+        type: Int
+        validation:
+          - GreaterThanOrEqual: 1
+      limit:
+        type: Int
+        validation:
+          - GreaterThanOrEqual: 5
+          - LessThanOrEqual: 200
+

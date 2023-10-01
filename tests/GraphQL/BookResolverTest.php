@@ -86,15 +86,65 @@ BD;
         yield 'error if try to filter items w/o name' => [
             self::queryBooks($filters),
             function (array $decodedResponse) {
-                $error = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("Invalid searching criteria is invalid. You can't search by other fields without name.\n", $error);
+                self::assertEquals(
+                    [
+                        "errors" => [
+                            [
+                                "message" => "validation",
+                                "locations" => [
+                                    [
+                                        "line" => 2,
+                                        "column" => 3
+                                    ]
+                                ],
+                                "path" => [
+                                    "books"
+                                ],
+                                "extensions" => [
+                                    "validation" => [
+                                        "filters.name" => [
+                                            [
+                                                "message" => "Invalid searching criteria is invalid. You can't search by other fields without name.",
+                                                "code" => null
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ], $decodedResponse);
             }
         ];
         yield 'error if try to count w/ filter w/o name' => [
             self::countBooks($filters),
             function (array $decodedResponse) {
-                $error = $decodedResponse['errors'][0]['message'] ?? '';
-                self::assertEquals("Invalid searching criteria is invalid. You can't search by other fields without name.\n", $error);
+                self::assertEquals(
+                    [
+                        "errors" => [
+                            [
+                                "message" => "validation",
+                                "locations" => [
+                                    [
+                                        "line" => 2,
+                                        "column" => 3
+                                    ]
+                                ],
+                                "path" => [
+                                    "countBooks"
+                                ],
+                                "extensions" => [
+                                    "validation" => [
+                                        "filters.name" => [
+                                            [
+                                                "message" => "Invalid searching criteria is invalid. You can't search by other fields without name.",
+                                                "code" => null
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ], $decodedResponse);
             }
         ];
     }
