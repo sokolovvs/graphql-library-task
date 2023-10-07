@@ -29,6 +29,7 @@ Mutation:
         args:
           book:
             type: BookData!
+            validation: cascade
         resolve: '@=mutation("App\\GraphQL\\Mutator\\BookMutator::createBook", args["book"])'
       editBook:
         type: Book!
@@ -37,6 +38,7 @@ Mutation:
             type: Int!
           book:
             type: BookData!
+            validation: cascade
         resolve: '@=mutation("App\\GraphQL\\Mutator\\BookMutator::editBook", args["id"], args["book"])'
       deleteBook:
         type: Boolean!

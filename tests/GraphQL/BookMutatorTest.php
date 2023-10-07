@@ -87,11 +87,52 @@ BD;
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $message = $decodedResponse['errors'][0]['message'] ?? '';
-        self::assertEquals("This value is too short. It should have 2 characters or more." . PHP_EOL .
-            "This value is too long. It should have 1024 characters or less." . PHP_EOL .
-            "This value is not a valid date." . PHP_EOL .
-            "Invalid authorId" . PHP_EOL, $message);
+        self::assertEquals(
+            [
+                "errors" => [
+                    [
+                        "message" => "validation",
+                        "locations" => [
+                            [
+                                "line" => 2,
+                                "column" => 3
+                            ]
+                        ],
+                        "path" => [
+                            "createBook"
+                        ],
+                        "extensions" => [
+                            "validation" => [
+                                "book.name" => [
+                                    [
+                                        "message" => "This value is too short. It should have 2 characters or more.",
+                                        "code" => "9ff3fdc4-b214-49db-8718-39c315e33d45"
+                                    ]
+                                ],
+                                "book.description" => [
+                                    [
+                                        "message" => "This value is too long. It should have 1024 characters or less.",
+                                        "code" => "d94b19cc-114f-4f44-9cc4-4138e80a87b9"
+                                    ]
+                                ],
+                                "book.publicationDate" => [
+                                    [
+                                        "message" => "Invalid publication date",
+                                        "code" => null
+                                    ]
+                                ],
+                                "book.authors[0]" => [
+                                    [
+                                        "message" => "Invalid authorId",
+                                        "code" => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $decodedResponse);
     }
 
     public function testRemoveBookUnknownBook(): void
@@ -185,7 +226,32 @@ BD;
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        self::assertEquals("This value should not be blank.\n", $decodedResponse['errors'][0]['message'] ?? '');
+        self::assertEquals([
+            "errors" => [
+                [
+                    "message" => "validation",
+                    "locations" => [
+                        [
+                            "line" => 2,
+                            "column" => 3
+                        ]
+                    ],
+                    "path" => [
+                        "editBook"
+                    ],
+                    "extensions" => [
+                        "validation" => [
+                            "book.authors" => [
+                                [
+                                    "message" => "This value should not be blank.",
+                                    "code" => "c1051bb4-d103-4f74-8988-acbcafc7fdc3"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ], $decodedResponse);
 
         $this->httpClient->request(Request::METHOD_POST, '/', [
             'query' => AuthorResolverTest::authorByIdQuery($authorId),
@@ -235,7 +301,31 @@ BD;
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
-        $message = $decodedResponse['errors'][0]['message'] ?? '';
-        self::assertEquals("This value is too short. It should have 2 characters or more.\n", $message);
+        self::assertEquals([
+            "errors" => [
+                [
+                    "message" => "validation",
+                    "locations" => [
+                        [
+                            "line" => 2,
+                            "column" => 3
+                        ]
+                    ],
+                    "path" => [
+                        "editBook"
+                    ],
+                    "extensions" => [
+                        "validation" => [
+                            "book.name" => [
+                                [
+                                    "message" => "This value is too short. It should have 2 characters or more.",
+                                    "code" => "9ff3fdc4-b214-49db-8718-39c315e33d45"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ], $decodedResponse);
     }
 }

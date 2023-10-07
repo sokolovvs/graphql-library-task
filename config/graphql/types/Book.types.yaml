@@ -17,10 +17,30 @@ BookData:
   type: input-object
   config:
     fields:
-      name: String!
-      description: String
-      publicationDate: String
-      authors: '[ID!]!'
+      name:
+        type: String!
+        validation:
+          - Length:
+              min: 2
+              max: 256
+              normalizer: trim
+      description:
+        type: String!
+        validation:
+          - Length:
+              max: 1024
+              normalizer: trim
+      publicationDate:
+        type: String
+        validation:
+          - App\Constraints\PublicationDateConstraint: ~
+      authors:
+        type: '[ID!]!'
+        validation:
+          - NotBlank: ~
+          - All:
+              constraints:
+                 - App\Constraints\AuthorIdConstraint: ~
 
 BooksFilters:
   type: input-object
