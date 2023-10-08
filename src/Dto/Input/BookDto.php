@@ -30,7 +30,7 @@ final class BookDto
     {
         $this->name = trim($name);
         $this->description = trim($description);
-        $this->publicationDate = trim($publicationDate);
+        $this->publicationDate = $publicationDate;
         $this->authors = array_unique($authors);
     }
 }

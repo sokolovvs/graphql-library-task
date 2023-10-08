@@ -39,7 +39,7 @@ final class BookMutator
         $book = new Book(
             $dto->name,
             $dto->description,
-            new DateTimeImmutable($dto->publicationDate),
+            $dto->publicationDate ? new DateTimeImmutable($dto->publicationDate) : null,
             ...$authors
         );
         $this->books->save($book);
@@ -69,7 +69,7 @@ final class BookMutator
         }
         $book->updateName($dto->name)
             ->updateDescription($dto->description)
-            ->updatePublicationDate(new DateTimeImmutable($dto->publicationDate));
+            ->updatePublicationDate($dto->publicationDate ? new DateTimeImmutable($dto->publicationDate) : null);
 
         $this->books->save($book);
 
