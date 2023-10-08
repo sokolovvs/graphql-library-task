@@ -173,7 +173,7 @@ BD;
             self::assertArrayHasKey('name', $book);
             self::assertIsString($book['name']);
             self::assertArrayHasKey('publicationDate', $book);
-            self::assertIsString($book['publicationDate']);
+            self::assertTrue(is_string($book['publicationDate']) || $book['publicationDate'] === null);
             self::assertArrayHasKey('authors', $book);
             self::assertIsArray($book['authors']);
         }

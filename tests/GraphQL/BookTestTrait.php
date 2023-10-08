@@ -6,12 +6,13 @@ use App\Tests\Utils\GraphQLUtil;
 
 trait BookTestTrait
 {
-    private function createBookMutation(string $name, string $description, string $publicationDate, array $authors): array
+    private function createBookMutation(string $name, string $description, ?string $publicationDate, array $authors): array
     {
         $authors = implode(',', $authors);
+        $publicationDate = $publicationDate === null ? '' : 'publicationDate: "' . $publicationDate . '",';
         return [
             "query" => "mutation createBook {
-  createBook(book: {name: \"$name\", description: \"$description\", publicationDate: \"$publicationDate\", authors: [$authors]}) {
+  createBook(book: {name: \"$name\", description: \"$description\", $publicationDate authors: [$authors]}) {
     id
   }
 }

@@ -79,11 +79,55 @@ BD;
         self::assertEquals(1, $numberBooks);
     }
 
-    public function testCreateBookFailed(): void
+    public function testCreateBookWithoutDate(): void
+    {
+        $this->em->persist($author = new Author('Lewis Carroll'));
+        $this->em->flush();
+        $name = 'Alice in Wonderland';
+        $description = self::BOOK_DESCRIPTION;
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->createBookMutation($name, $description, null, [$authorId = $author->getId()]));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        $id = $decodedResponse['data']['createBook']['id'] ?? -1;
+
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->queryBookById($id));
+        $response = $this->httpClient->getResponse();
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $decodedResponse = json_decode($response->getContent(), true);
+        self::assertEquals([
+            "data" => [
+                "book" => [
+                    "id" => $id,
+                    "name" => $name,
+                    "description" => $description,
+                    "publicationDate" => null,
+                    "authors" => [
+                        [
+                            "id" => $author->getId()
+                        ],
+                    ],
+                ]
+            ]
+        ], $decodedResponse);
+    }
+
+    public function createBookFailedDataProvider(): iterable
+    {
+        yield 'not date -> error' => ['0 BC'];
+        $tomorrow = new DateTimeImmutable('tomorrow');
+        yield 'tomorrow -> error' => [$tomorrow->format('Y-m-d')];
+    }
+
+    /**
+     * @dataProvider createBookFailedDataProvider
+     */
+
+    public function testCreateBookFailed(?string $publicationDate): void
     {
         $name = ' A   \n';
         $description = self::BOOK_DESCRIPTION;
-        $this->httpClient->request(Request::METHOD_POST, '/', $this->createBookMutation($name, str_repeat($description, 10), '0 BC', [-512]));
+        $this->httpClient->request(Request::METHOD_POST, '/', $this->createBookMutation($name, str_repeat($description, 10), $publicationDate, [-512]));
         $response = $this->httpClient->getResponse();
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $decodedResponse = json_decode($response->getContent(), true);
